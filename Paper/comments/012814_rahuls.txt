@@ -1,0 +1,53 @@
+Hi Woojong,
+
+I read the draft of the methods section that you sent out. Here are my high-level comments.
+
+Most importantly we should work on the overall structure of the text. In general, when you write a technical section, you need to start with an introduction that cover the context and motivation and gives a brief overview of the whole algorithm and its components. When you have several different components in the main body, you may also want to have a bit at the end where you summarize how they all fit together.
+
+For this paper, I think you can put in the intro the following things:
+- A brief one-paragraph summary of the dynamic remeshing algorithm from our previous papers, introducing the sizing tensor M and the terms that go into it.
+- Some discussion of how and why we want to modify this algorithm, similar to the motivation in the paper intro but more technical. It’s nice if we have some precise mathematical characterization of what we are trying to achieve. Also, this would be a good place to introduce the idea of the view factor.
+- A brief overview of the things we’ll be talking about in the remainder of the section. Mention the view-dependent criteria and temporal smoothing.
+
+Then when you come to each of the terms you introduce, i.e. visibility, orientation, and distance, it’s weird to discuss them once in broad terms and then later give technical details halfway into the section. If you’ve briefly mentioned all of them in the intro paragraphs, that gives you leeway to describe each of them in full detail one at a time when you get to them. So for each one, you’ll describe the basic idea and then give the formulas for how they affect the view factor and/or other remeshing parameters. At the end of the section, you can summarize the algorithm and if necessary write out the final expression for the sizing tensor incorporating all of the modifications.
+
+I have a lot of lower-level comments as well, which I’ll send out in a later email.
+
+Rahul
+
+
+I checked out the latest version from SVN, which seemed to be newer than the PDF you sent. Here are lots and lots of low-level comments.
+
+- lines 69-71: I guess what you’re trying to say is that whether a cloth face lies within the view frustum depends on both the camera motion and the motion of the cloth. I wouldn’t call them “variables” which sounds like floating-point scalars or boolean values. Also this paragraph ends abruptly without making a point; you should delete the paragraph break and combine the paragraph with the next one.
+
+- l.72-81: This paragraph is confusing. Are you just saying that you assume the cloth is static? Then you should say so directly.
+
+- l.82-91: What is the purpose of this paragraph?
+
+- l.100: “we are currently using isotropic remeshing” — This is not correct. We are using anisotropic remeshing, but your view-dependent scaling of the sizing tensor is isotropic.
+
+- l.105: Foreshortening refers to the apparent shortening of lines slanted towards the camera, not the reduced apparent size due to distance. In fact you should say “foreshortening” when discussing the orientation term, not here.
+
+- l.111: Why does the low variance of distances mean that the distance should be taken carefully?
+
+- l.112-129: It’s not really clear what the difference you’re talking about really is. I guess you’re trying to give an a priori justification for why you used distance to control the bounds on edge lengths rather than the sizing tensor directly, but your argument is sort of vague and not very rigorous. In that case you should consider giving an a posteriori justification instead: say this is what you did because it works, and give examples of what goes wrong if you do something else.
+
+- General question: Have you considered formulating the view-dependent criteria in terms of the angle subtended at the viewer, i.e. the projected size of the edge in the image? This would then apply elegantly to both the distance term and the orientation as well. An edge outside the view frustum would have a projected size of zero, for which you’d keep a baseline edge size (naturally then also applying to the back-facing edges).
+
+- l.136-137: “Thus, this criterion is not per-face remeshing criterion, rather it is [effectively a] per-cloth criterion.” To make it clearer, just say that this criterion is particularly useful when animating multiple characters at different distances from the camera.
+
+- l.136-141: This sentence is confusing. Split it into two sentences.
+
+- eq.1: If cos theta <= 0 and the face is backward-facing, why have ^cos^ theta vary at all? Why not just let it be 0?
+
+- eqs.1-2: The notation ^cos^ theta is weird. Since you apply it only to theta why not just define a variable c = { k (cos theta + 1) … instead? Or better, you could even collapse eqs. 1 and 2 into a single equation, since eq. 1 isn’t that important by itself.
+
+- l.158-166: You should first explain why we’re having a transition zone with a falloff in the first place. This is an important idea.
+
+- eqs.3-4: Since the idea here is super simple and easy to state precisely in words (we set the view factor mu to linearly fall off with distance from the view frustum, from 1 inside to 0 at a distance m), I think the equations are unnecessary and a little distracting.
+
+- l.169-174: You state a lot of different things in this sentence. All of them need to be explained in more detail.
+
+- l.177-178: What does “to offset the camera motion” mean? “Offset” is not the right word to use here. You should say we use temporal smoothing to avoid discontinuous changes in mesh size, which may cause noticeable popping artifacts. Also it is important to mention anticipation which ensures that the cloth gets refined to sufficient resolution *before* it appears in the frame.
+
+Rahul
