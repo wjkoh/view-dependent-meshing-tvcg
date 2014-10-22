@@ -566,6 +566,13 @@ detection and interpenetration handling, inherently have to work with triangles 
 space.  Thus, if we end up with too small triangles after compression, the simulation
 fails in some parts, for example collision detection, due to singularity.
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=1.0\columnwidth]{subelement_compression/no_vs_adaptive}
+  \caption{No relaxation vs. adaptive relaxation in action.}
+  \label{fig:no_vs_adaptive}
+\end{figure}
+
 Lastly, this approach isn't limited to view-dependent adaptivity, so it can be applied to
 any other adaptive algorithm suffering from similar artifact.  Note that compression
 factor $\beta$ isn't related with view factor directly. Buckling is physical behavior and
