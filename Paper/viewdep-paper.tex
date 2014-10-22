@@ -509,9 +509,10 @@ artifact isn't visible to the viewer. Our spatial and temporal smoothing ensure 
 stiffened cloth coming into the view would return to the correct state in advance.
 
 However, there are several side effects: (1) slowing down simulation due to unresolved
-compressive strain, (2) introducing premature refinement by spatial and temporal
-anticipation due to its incorrect volume, and (3) obstructing a scene and making it hard
-to view from other than the camera perspective.
+compressive strain \woojong{Actually, I found there is no difference between relaxed and
+non-relaxed simulations in terms of computation time.}, (2) introducing premature
+refinement by spatial and temporal anticipation due to its incorrect volume, and (3)
+obstructing a scene and making it hard to view from other than the camera perspective.
 
 A potential strategy to avoid this artificial stiffening would be to switch coarse faces
 to a material model that permits compression in lieu of sub-element buckling
