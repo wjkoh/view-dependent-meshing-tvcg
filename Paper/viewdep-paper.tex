@@ -546,8 +546,15 @@ we discuss later. Since our compression factor is $k$th power of material-space 
 $k \geq 1$, the degree of allowed compression changes adaptively: the bigger triangle, the
 more compressible.
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=1.0\columnwidth]{subelement_compression/no_full_adaptive_compression}
+  \caption{No relaxation, full relaxation, and adaptive relaxation.}
+  \label{fig:no_full_adaptive}
+\end{figure}
+
 This area-based adaptive relaxation has several advantages over static relaxation.  First,
-it prevents excessive compression as shown in Figure~\ref{}. On the waist part of the
+it prevents excessive compression as shown in Figure~\ref{fig:no_full_adaptive}. On the waist part of the
 dress, there is excessive compression which makes the dress shorter than the original
 shape. These overly compressed triangles inflate quickly and cause popping artifacts when
 going visible. Thus, we need to extend both spatial and temporal smoothing more than
