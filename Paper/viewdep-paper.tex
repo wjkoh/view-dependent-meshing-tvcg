@@ -493,60 +493,60 @@ Instead we use the approach of intersection contour minimization proposed by Vol
 
 \subsection{Relaxing artificial stiffening}
 
-In non-visible regions that are heavily coarsened, we sometimes see a ballooning effect
+In non-visible regions that are heavily coarsened, we sometimes see a ``ballooning'' effect
 (for example in Figure \ref{fig:temporal_anticipation} and~\ref{fig:crowd}) due to
 artificial stiffening: the wrinkles that would normally allow the cloth to hang loosely
 cannot be represented on such a coarse mesh.
 
-In general, a cloth is nearly incompressible, so it tends to buckle rather than shrink
-under compression.  This can be a problem when the size of each face is
-relatively larger than the scale of potential buckling because our element, triangle,
-should be planar. Heavily coarsened faces prevent buckling, and, in turn, a cloth starts
-ballooning because unresolved compressive strain makes faces push one another.
+In general, cloth is nearly inextensible, so it tends to buckle rather than shrink
+under compression.  This can create incorrect behavior when the size of each face is
+larger than the scale of potential buckling and therefore cannot resolve this deformation. Because fine-scale buckling is prevented, the cloth appears artifically resistant to bending and balloons out.
 
-There are several ways of handling this problem. The easiest one is just letting as it is
-like we did in our examples. Since the effect affects only out-of-frame faces, the
-artifact isn't visible to the viewer. Our spatial and temporal smoothing ensure that any
+To an extent, this issue can be overlooked as we have done so far in our examples. Since the artificial stiffening only affects out-of-frame faces, the
+artifact is not visible to the viewer. Our spatial and temporal smoothing ensure that any
 stiffened cloth coming into the view would return to the correct state in advance.
-
-However, there are several side effects: (1) slowing down simulation due to unresolved
+However, there are a few side effects: (1) slowing down simulation due to unresolved
 compressive strain \woojong{Actually, I found there is no difference between relaxed and
 non-relaxed simulations in terms of computation time.}, (2) introducing premature
-refinement by spatial and temporal anticipation due to its incorrect volume, and (3)
-obstructing a scene and making it hard to view from other than the camera perspective.
+refinement by spatial and temporal anticipation due to its incorrect volume, (3)
+obstructing a scene and making it hard to view from other than the camera perspective, and (4) the possibility that incorrect dynamics in the stiffened regions affects the behavior of the visible part of the cloth.
 
-A potential strategy to avoid this artificial stiffening would be to switch coarse faces
+We can avoid this artificial stiffening by switching coarse faces
 to a material model that permits compression in lieu of sub-element buckling
-\cite{Choi:2002:SBR,Wang:2010:MIS}. We allow compression adaptively based on each face's
-area like the following. The Green strain tensor of face $i$ is defined as
-\begin{align}
-  \textbf{E}_i &= \frac{1}{2}(\textbf{F}^\mathsf{T}_i \textbf{F}_i - \textbf{I}), \\
-               &= \textbf{Q}_i \begin{bmatrix}\lambda_1 & 0 \\ 0 & \lambda_2\end{bmatrix}
-  \textbf{Q}^\mathsf{T}_i.
-\end{align}
+\cite{Choi:2002:SBR,Wang:2010:MIS}.
+However, simply removing compression resistance for all non-visible faces creates undesirable artifacts as well, as shown in Figure \ref{fig:no_full_adaptive} (middle). Instead, we allow compression adaptively based on each face's
+area as follows.
 
-We allow compression by reducing compressive strain artificially. In specific, we replace
-the strain tensor $\textbf{E}_i$ of out-of-frustum face $i$ with
-$\hat{\textbf{E}}_i$,
-\begin{align}
-  \hat{\textbf{E}}_i &= \textbf{Q}_i \begin{bmatrix}\hat\lambda_1 & 0 \\ 0 &
-\hat\lambda_2\end{bmatrix} \textbf{Q}^\mathsf{T}_i, \\
-  \hat\lambda_j &=
+The Green strain tensor of face $i$ is
+\begin{equation}
+  \textbf{E}_i = \frac{1}{2}(\textbf{F}_i^\mathsf{T} \textbf{F}_i - \textbf{I}),
+\end{equation}
+where $\mathbf F_i$ is the deformation gradient.
+% and compute its eigendecomposition as 
+% \begin{equation}
+%   \textbf{E} = \textbf{Q} \begin{bmatrix}\lambda_1 & 0 \\ 0 & \lambda_2\end{bmatrix}
+%   \textbf{Q}^\mathsf{T}.
+% \end{equation}
+We reduce the material's compression resistance by simply reducing the amount of compressive strain that the constitutive model sees. Specifically, for each out-of-frustum face, we compute the eigendecomposition of its strain tensor $\textbf{E}_i$ to obtain principal strains $\lambda_1$ and $\lambda_2$. We replace each principal strain with
+% $\hat{\textbf{E}}_i$,
+% \begin{align}
+%   \hat{\textbf{E}}_i &= \textbf{Q}_i \begin{bmatrix}\hat\lambda_1 & 0 \\ 0 &
+% \hat\lambda_2\end{bmatrix} \textbf{Q}^\mathsf{T}_i, \\
+\begin{equation}
+  \hat\lambda_j =
   \begin{cases}
     \lambda_j & \text{if } \lambda_j \geq 0, \\
     \beta_i\lambda_j & \text{if } \lambda_j < 0,
   \end{cases}
-\end{align}
-and area-based compression factor $\beta_i$,
+\end{equation}
+with area-based compression factor $\beta_i$,
 \begin{gather}
-  \beta_i = \left(\frac{A_i - b}{a - b}\right)^k, \\
-  a = \min_{\forall j \in S} A_j,\quad b = \max_{\forall j \in S} A_j,\quad k \ge 1,
+  \beta_i = \left(\frac{b - A_i}{b - a}\right)^k, \\
+  a = \min_{\forall j \in S} A_j,\quad b = \max_{\forall j \in S} A_j,
 \end{gather}
 where $A_i$ is area of face $i$ in material space, $S$ is a set of all out-of-frustum
-faces, and $k$ is the largest number that doesn't introduce any excessive compression that
-we discuss later. Since our compression factor is $k$th power of material-space area and
-$k \geq 1$, the degree of allowed compression changes adaptively: the bigger triangle, the
-more compressible.
+faces, and $k\ge1$ is a parameter controlling the amount of relaxation. Since our compression factor increases with material-space area, the degree of allowed compression changes adaptively: the bigger the triangle, the
+more compressible it is.
 
 \begin{figure}[t]
   \centering
@@ -555,17 +555,13 @@ more compressible.
   \label{fig:no_full_adaptive}
 \end{figure}
 
-This area-based adaptive relaxation has several advantages over static relaxation.  First,
-it prevents excessive compression as shown in Figure~\ref{fig:no_full_adaptive}. On the waist part of the
+This area-based adaptive relaxation has several advantages over non-adaptive relaxation. First,
+it prevents excessive compression as shown in Figure~\ref{fig:no_full_adaptive} (right). On the waist of the
 dress, there is excessive compression which makes the dress shorter than the original
 shape. These overly compressed triangles inflate quickly and cause popping artifacts when
-going visible. Thus, we need to extend both spatial and temporal smoothing more than
-previously necessary.  Second, this excessive compression may result in too small
-triangles. Though most of our simulation steps works with triangles in material space,
-which is not affected by deformation in world space, some operations, such as collision
-detection and interpenetration handling, inherently have to work with triangles in world
-space.  Thus, if we end up with too small triangles after compression, the simulation
-fails in some parts, for example collision detection, due to singularity.
+they become visible, necessitating a much greater amount of spatial and temporal smoothing.  Second, this excessive compression may result in extremely small
+triangles. Certain simulation steps such as collision
+detection and interpenetration handling have difficulty handling these highly compressed triangles robustly.
 
 \begin{figure}[t]
   \centering
@@ -574,11 +570,11 @@ fails in some parts, for example collision detection, due to singularity.
   \label{fig:no_vs_adaptive}
 \end{figure}
 
-Lastly, this approach isn't limited to view-dependent adaptivity, so it can be applied to
-any other adaptive algorithm suffering from similar artifact.  Note that compression
-factor $\beta$ isn't related with view factor directly. Buckling is physical behavior and
-has nothing to do with view dependency. Thus, the compression factor can be computed
-entirely from the area of faces and user parameter $k$.
+Finally, we point out that this approach is not limited to view-dependent adaptivity, and can be applied to
+any other adaptive algorithm suffering from similar artifacts.  The compression
+factor $\beta$ is unrelated to the view factor, as buckling is a physical phenomenon and
+has nothing to do with view dependence. Therefore, the compression factor is defined
+entirely in terms of the area of faces and the user parameter $k$.
 
 %if $S$ contains faces large enough to prevent buckling. Our view factor $\nu_\text{out}$
 %makes faces large enough to prevent buckling because that is why we look into this
@@ -755,15 +751,15 @@ images in this paper and video were rendered with the Mitsuba renderer by Wenzel
 
 \begin{IEEEbiography}
 %[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{photo}}]
-{Woojong Koh} is a third-year Ph.D. student in Computer Science at University of
-California, Berkeley, and received his B.S. in Computer Science and Engineering at Seoul
+{Woojong Koh} is a third-year Ph.D.~student in Computer Science at University of
+California, Berkeley, and received his B.S.~in Computer Science and Engineering at Seoul
 National University, Seoul, South Korea.
 \end{IEEEbiography}
 
 \begin{IEEEbiography}
 %[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{photo}}]
 {Rahul Narain}
-is a postdoctoral scholar. More biography text.
+is a postdoctoral scholar at the University of California, Berkeley, and received his Ph.D.~in computer science from the University of North Carolina at Chapel Hill. His research interests lie in physically-based animation, particularly focusing on numerical techniques for modeling complex multiscale phenomena. Rahul Narain will join the University of Minnesota, Twin Cities as an assistant professor in 2015.
 \end{IEEEbiography}
 
 \begin{IEEEbiography}
