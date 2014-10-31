@@ -505,11 +505,8 @@ larger than the scale of potential buckling and therefore cannot resolve this de
 To an extent, this issue can be overlooked as we have done so far in our examples. Since the artificial stiffening only affects out-of-frame faces, the
 artifact is not visible to the viewer. Our spatial and temporal smoothing ensure that any
 stiffened cloth coming into the view would return to the correct state in advance.
-However, there are a few side effects: (1) slowing down simulation due to unresolved
-compressive strain \woojong{Actually, I found there is no difference between relaxed and
-non-relaxed simulations in terms of computation time.}, (2) introducing premature
-refinement by spatial and temporal anticipation due to its incorrect volume, (3)
-obstructing a scene and making it hard to view from other than the camera perspective, and (4) the possibility that incorrect dynamics in the stiffened regions affects the behavior of the visible part of the cloth.
+Nevertheless, this incorrect motion in non-visible regions may cause undesirable side effects, such as introducing premature
+refinement by spatial and temporal anticipation due to the volume occupied by the stiffened cloth, and more generally, the potential for incorrect dynamics in the stiffened regions to affect the behavior of the visible part of the cloth.
 
 We can avoid this artificial stiffening by switching coarse faces
 to a material model that permits compression in lieu of sub-element buckling
@@ -572,9 +569,8 @@ detection and interpenetration handling have difficulty handling these highly co
 
 Finally, we point out that this approach is not limited to view-dependent adaptivity, and can be applied to
 any other adaptive algorithm suffering from similar artifacts.  The compression
-factor $\beta$ is unrelated to the view factor, as buckling is a physical phenomenon and
-has nothing to do with view dependence. Therefore, the compression factor is defined
-entirely in terms of the area of faces and the user parameter $k$.
+factor $\beta$ is unrelated to the view factor, as buckling is purely a physical phenomenon independent of the viewing direction. Therefore, we have defined the compression factor
+entirely in terms of the area of faces and a user-defined parameter $k$.
 
 %if $S$ contains faces large enough to prevent buckling. Our view factor $\nu_\text{out}$
 %makes faces large enough to prevent buckling because that is why we look into this
@@ -765,7 +761,7 @@ is a postdoctoral scholar at the University of California, Berkeley, and receive
 \begin{IEEEbiography}
 %[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{photo}}]
 {James F.~O'Brien}
-is a professor. More biography text.
+is a professor at the University of California, Berkeley. He received his doctorate in Computer Science from the Georgia Institute of Technology. He is generally interested in most areas of computer graphics and animation. His primary area of research involves the physically based simulation of complex deformable and fluid systems to generate motion for use in computer animation.
 \end{IEEEbiography}
 
 \vfill
