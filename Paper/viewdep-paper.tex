@@ -489,7 +489,7 @@ Remeshing invariably produces changes in the geometry of the cloth mesh, and can
 We found that the simple approach for interpenetration handling used in previous remeshing work \cite{Narain:2012:AAR} does not always converge to an interpenetration-free configuration in the presence of the agressive coarsening we perform in non-visible regions.
 Instead we use the approach of intersection contour minimization proposed by Volino et al.~\cite{Volino:2006:RSC}, which we found to be robust to large and complex interpenetrations.
 
-\subsection{Relaxing artificial stiffening}
+\subsection{Coarse-scale buckling compensation}
 
 In non-visible regions that are heavily coarsened, we sometimes see a ``ballooning'' effect
 (for example in Figure \ref{fig:temporal_anticipation} and~\ref{fig:crowd}) due to
@@ -540,18 +540,19 @@ with area-based compression factor $\beta_i$,
   a = \min_{\forall j \in S} A_j,\quad b = \max_{\forall j \in S} A_j,
 \end{gather}
 where $A_i$ is area of face $i$ in material space, $S$ is a set of all out-of-frustum
-faces, and $k\ge1$ is a parameter controlling the amount of relaxation. Since our compression factor increases with material-space area, the degree of allowed compression changes adaptively: the bigger the triangle, the
+faces, and $k\ge1$ is a parameter controlling the amount of compensation. Since our compression factor increases with material-space area, the degree of allowed compression changes adaptively: the bigger the triangle, the
 more compressible it is.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=1.0\columnwidth]{subelement_compression/no_full_adaptive_compression}
-  \caption{A comparison of no relaxation (left), non-adaptive relaxation (middle), and
-  adaptive relaxation with $k = 10$ (right).}
+  \caption{A comparison of no compensation (left), non-adaptive compensation (middle), and
+  adaptive compensation with $k = 10$ (right).}
   \label{fig:no_full_adaptive}
 \end{figure}
 
-This area-based adaptive relaxation has several advantages over non-adaptive relaxation. First,
+This area-based adaptive compensation has several advantages over non-adaptive
+compensation. First,
 it prevents excessive compression as shown in Figure~\ref{fig:no_full_adaptive} (right). On the waist of the
 dress, there is excessive compression which makes the dress shorter than the original
 shape. These overly compressed triangles inflate quickly and cause popping artifacts when
@@ -562,7 +563,7 @@ detection and interpenetration handling have difficulty handling these highly co
 \begin{figure}[t]
   \centering
   \includegraphics[width=1.0\columnwidth]{subelement_compression/no_vs_adaptive}
-  \caption{No relaxation (top) and adaptive relaxation with $k = 10$ (bottom) in Multiple
+  \caption{No compensation (top) and adaptive compensation with $k = 10$ (bottom) in Multiple
   Dancers example.}
   \label{fig:no_vs_adaptive}
 \end{figure}
