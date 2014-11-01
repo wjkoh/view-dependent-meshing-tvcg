@@ -117,25 +117,23 @@ Physically based modeling, animation
 
 \IEEEraisesectionheading{\section{Introduction}\label{sec:introduction}}
 
-\IEEEPARstart{C}{loth} simulation for visual effects has reached a mature state where
-the use of virtual characters wearing simulated clothing is now
-widespread.  However, cloth simulation remains computationally
-expensive, particularly when films require high-quality, realistic
-results computed at high resolution.  For characters that are far from
-the camera, or otherwise less visible in a shot, fine details
-will not be visible to the viewer and work spent computing those
-details is wasted.  In most film production settings, both the camera
-and character motions are known before the simulations are run, and one
-could use this information to substitute cheaper low-resolution
-simulations on distant or out-of-frame characters.  Unfortunately,
-manually swapping some characters to low-resolution simulations is
-cumbersome, particularly when a single character's clothing requires
-high resolution for some parts of a shot but not others, but the cloth
-motion must appear coherent throughout.  For closeup shots where only
-part of a character is in frame, savings could also be realized by reducing
-the computation devoted to out-of-frame cloth, so long as such savings
-do not result in dynamic artifacts that affect visible parts of the
-cloth.
+\IEEEPARstart{C}{loth} 
+simulation for visual effects has reached a mature state where the use of
+virtual characters wearing simulated clothing is now widespread. However, cloth
+simulation remains computationally expensive, particularly when films require
+high-quality, realistic results computed at high resolution. For characters
+that are far from the camera, or otherwise less visible in a shot, fine details
+will not be visible to the viewer and work spent computing those details is
+wasted. In most film production settings, both the camera and character motions
+are known before the simulations are run, and one could use this information to
+substitute cheaper low-resolution simulations on distant or out-of-frame
+characters. Unfortunately, manually swapping some characters to low-resolution
+simulations is cumbersome, particularly when a single character's clothing
+requires high resolution for some parts of a shot but not others, yet the cloth
+motion must nevertheless appear coherent throughout. For closeup shots where
+only part of a character is in frame, savings could also be realized by
+reducing the computation devoted to out-of-frame cloth, so long as such savings
+do not result in dynamic artifacts that affect visible parts of the cloth.
 
 In this paper we describe a method for \textit{view-dependent simulation} using
 dynamically adaptive mesh refinement and coarsening.  Instead of using
@@ -174,17 +172,17 @@ coherent and consistent dynamics.
 Our work builds on the publicly available \arcsim
 framework (\url{http://graphics.berkeley.edu/resources/ARCSim}) which
 can be used to animate sheets of deformable materials such as cloth, paper,
-plastic, and metal. \arcsim adaptively refines anisotropic triangle meshes to
+plastic, and metal. \arcsim adaptively refines and coarsens anisotropic triangle meshes to
 efficiently resolve the geometric and dynamic detail of the simulated objects.
 Our method modifies the metrics used by \arcsim so that local mesh visibility
 is accounted for during refinement. Given the existing framework for adaptivity,
 our view-dependent refinement is easy to implement and has negligible overhead.
 
-In cases where only a single character is being modeled, we realize modest savings of roughly a $2.4\times$ speed-up in comparison with \arcsim's
+In cases where only a single character is being modeled, our approach realizes modest savings of roughly a $2.4\times$ speed-up in comparison with \arcsim's
 default adaptive simulation. These savings are due to coarsening out-of-view and back-facing parts of the character's clothing. For small crowd
 scenes, the savings are larger, up to $4.5\times$, as background and out-of-view characters are automatically coarsened. Compared to a non-adaptive
 simulation, the speed-up is more than $9\times$. For massive crowd scenes with thousands of agents, we expect that even greater savings could be
-realized with out approach.
+realized with our approach.
 
 
 
@@ -212,7 +210,7 @@ which use remeshing to resolve detailed wrinkles and folds. The approach of
 Narain et al.~\cite{Narain:2012:AAR} has also been extended to efficiently model
 plastic deformation and sharp creases \cite{Narain:2013:FCA} as well as complex
 fracture patterns \cite{Pfaff:2014:ATC}. However, all those techniques 
-are view-independent and sizing is controlled only by geometrical and dynamical
+are view-independent and element sizing is controlled only by geometrical and dynamical
 properties of the simulated system.
 
 For animation applications, a number of techniques have also been proposed that
@@ -223,7 +221,7 @@ models of varying degrees of simplification, depending on the viewpoint.
 Carlson and Hodgins \cite{Carlson:1997:SLD} introduced such a method for
 real-time animation of large groups of legged creatures. Their
 approach required the user to manually design the simplified models for each
-level of detail.%, whereas ours does not.
+level of detail. %, whereas ours does not.
 Subsequent work has sought to generate approximated
 models automatically, for example for particle systems~\cite{OBrien:2001:ASP},
 plants~\cite{Beaudoin:2004:SLD}, and hair~\cite{Ward:2003:MHU}.
@@ -776,6 +774,8 @@ is a Sloan Fellow and ACM Distinguished Scientist, Technology Review selected
 him as one of their TR-100, and he has been awarded research grants from the
 Okawa and Hellman Foundations. He is currently serving as ACM SIGGRAPH Director
 at Large.
+\end{IEEEbiography}
+
 
 \vfill
 
