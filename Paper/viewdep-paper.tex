@@ -231,7 +231,7 @@ Barran \cite{Barran:2006:VDF} performed fluid simulation on a non-Cartesian grid
 discretization.
 Viewpoint information has also been used to vary simulation resolution in traditional adaptive discretizations for fluids, such as octrees \cite{Kim:2006:VAA,Bunlutangtum:2011:EVA} and adaptive particles \cite{Solenthaler:2011:TPS}.
 
-In our work, we also take inspiration from geometric level of detail techniques, such as those for real-time rendering of terrain~\cite{Duchaineau:1997:RTR,Hoppe:1998:SVL} or complex scenes like architectural walkthroughs~\cite{Funkhouser:1993:ADA}.
+In our work, we take inspiration from geometric level of detail techniques, such as those for real-time rendering of terrain~\cite{Duchaineau:1997:RTR,Hoppe:1998:SVL} or complex scenes like architectural walkthroughs~\cite{Funkhouser:1993:ADA}.
 These techniques inform our understanding of the important view-dependent criteria for representing geometrical detail.
 Hoppe~\cite{Hoppe:1997:VRP} used surface orientation and screen-space geometric
 error as refinement criteria.
@@ -241,7 +241,7 @@ Xia et al.~\cite{Xia:1997:ARL} further propose the use of local illumination gra
 
 \section{Methods}
 
-Our view-dependent adaptive remeshing scheme builds on the adaptive anisotropic
+Our view-dependent adaptive remeshing scheme builds on \arcsim, the adaptive anisotropic
 remeshing framework described by Narain et al.~\cite{Narain:2012:AAR}. We introduce a new
 view-dependent refinement strategy that complements their use of dynamical and
 geometrical refinement criteria. This approach realizes significant speed
@@ -300,7 +300,7 @@ increases the target edge lengths by a factor of $\nu^{-1}$.
 
 In general, we would like to use full resolution ($\nu=1$) for faces that are visible
 in the current view, and coarser resolution for back-facing and out-of-frame faces based on user-specified parameters $\nu_{\text{back}}, \nu_{\text{out}} < 1$.
-However, simply defining $\nu$ in this piecewise-constant
+However, simply defining $\nu$ in a piecewise-constant
 fashion causes severe artifacts because of the discontinuous change in the sizing
 field.
 First, the discontinuity in sizes at the boundary between in-frame and out-of-frame faces leads to noticeable motion artifacts such as popping due to the influence of spurious forces from the out-of-frame region.
@@ -341,14 +341,14 @@ spatially smoothed view factor $\tilde\nu$ by linearly interpolating to $\nu_{\t
 \end{align}
 where $\nu_{\text{fb}}$ is $1$ or $\nu_{\text{back}}$ depending on the direction of the face normal.
 Thus, we have $\tilde\nu = 1$ or $\nu_{\text{back}}$ for in-frame faces and $\tilde\nu =
-\nu_{\text{out}}$ for out-of-frame faces far from the view frustum, with a continuous transition region in between, as Figure \ref{fig:spatial_smoothing} shows.
+\nu_{\text{out}}$ for out-of-frame faces far from the view frustum, with a continuous transition region in between, as Figure~\ref{fig:spatial_smoothing} shows.
 
 There is still a discontinuity on the boundary between front-facing faces
 and backward-facing faces. While it is tempting to use the direction of the
 normal of back-faces to create a smooth transition, we find that normals can vary too
 rapidly across silhouettes to offer any useful smoothing that way. Instead, we
 address this discontinuity with a different approach, described later in
-Section \ref{sec:silhouette-preserving}.
+Section~\ref{sec:silhouette-preserving}.
 
 \subsubsection{Temporal smoothing and anticipation} 
 
@@ -386,7 +386,7 @@ In our implementation, we use $w(\tau) = 1 - \tau/T$.
 
 Unlike smoothing by, say, moving averages, our approach is conservative in that $\nu(t) \ge \tilde\nu(t)$; in particular, visible regions always have $\nu = 1$.
 Further, in the presence of discontinuities such as jump cuts, $\nu$ increases continuously from $\nu_{\text{out}}$ to $1$ over a time period $T$ in advance of the jump.
-This anticipatory refinement allows enough time for the system to settle into a feasible high-resolution state before becoming visible, as shown in Figure \ref{fig:temporal_anticipation}.
+This anticipatory refinement allows enough time for the system to settle into a feasible high-resolution state before becoming visible, as shown in Figure~\ref{fig:temporal_anticipation}.
 
 \subsection{Screen-space resolution of visible regions}
 
@@ -406,7 +406,7 @@ This anticipatory refinement allows enough time for the system to settle into a 
 In non-visible regions, it is sufficient to uniformly coarsen the mesh resolution as above.
 However, for visible regions, we wish to preserve the geometrical and dynamical detail resolved by the original sizing field as much as possible, only coarsening when such detail would not be visually important.
 
-The original sizing field $\mathbf M_{\text{vd}}$ gives the mesh resolution needed to accurately capture the dynamics of all cloth features.
+The sizing field $\mathbf M_{\text{vd}}$ gives the mesh resolution needed to accurately capture the dynamics of all cloth features.
 From the camera's perspective, however, wrinkles and folds that are very distant or foreshorted will appear extremely small in the final image.
 Such features are not likely to affect the visual appearance of the cloth and need not be represented accurately; they can simply be coarsened away.
 On the other hand, features that appear large in the image should remain accurately represented at the resolution determined by the original sizing field.
@@ -470,7 +470,7 @@ factor changes from $1$ to $\nu_{\text{out}}$. The issue is exacerbated because 
 regions, which have larger faces, are given higher weight, leading to excessive coarsening
 at boundary vertices.
 
-In order to handle this discontinuity on view factors, we first resample per-face view
+In order to handle this discontinuity in view factors, we first resample per-face view
 factors before the simple area-weighted averaging procedure. If the values of $\nu$ differ by more than a specified threshold across any edge, we do simple
 averaging between two adjacent view factors, and assign the averaged value to one
 of the faces as shown in Figure~\ref{fig:silhouette_preserving}. As we don't want to
@@ -486,30 +486,38 @@ boundaries, so it does not hinder overall performance.
 \subsection{Interpenetration handling}
 
 Remeshing invariably produces changes in the geometry of the cloth mesh, and can introduce interpenetrations of the cloth with itself or with obstacles.
-We found that the simple approach for interpenetration handling used in previous remeshing work \cite{Narain:2012:AAR} does not always converge to an interpenetration-free configuration in the presence of the agressive coarsening we perform in non-visible regions.
+We found that the simple approach for interpenetration handling used in previous remeshing work \cite{Narain:2012:AAR} does not always converge to an interpenetration-free configuration in the presence of the aggressive coarsening we perform in non-visible regions.
 Instead we use the approach of intersection contour minimization proposed by Volino et al.~\cite{Volino:2006:RSC}, which we found to be robust to large and complex interpenetrations.
 
 \subsection{Coarse-scale buckling compensation}
 
-In non-visible regions that are heavily coarsened, we sometimes see a ``ballooning'' effect
-(for example in Figure \ref{fig:temporal_anticipation} and~\ref{fig:crowd}) due to
-artificial stiffening: the wrinkles that would normally allow the cloth to hang loosely
-cannot be represented on such a coarse mesh.
+Real cloth materials typically have a relatively high resistance to in-plane
+compression, but a relatively low resistance to out-of-plane bending. As a
+result, cloth will often drape in configurations that would be non-developable
+at coarse scale, but where fine-scale wrinkles and folds take the place of
+coarse-scale compression. These fine wrinkles and folds not only allow commonly
+observed draping, but they are also responsible for giving specific materials
+their distinctive appearances.
 
-In general, cloth is nearly inextensible, so it tends to buckle rather than shrink
-under compression.  This can create incorrect behavior when the size of each face is
-larger than the scale of potential buckling and therefore cannot resolve this deformation. Because fine-scale buckling is prevented, the cloth appears artifically resistant to bending and balloons out.
+However, extremely coarse mesh regions do not have the resolution required to
+form fine wrinkles or folds, and furthermore those coarse regions tend to
+suffer from element locking that suppresses bending and wrinkle formation. As a
+result, when out-of-view regions are heavily coarsened, they often exhibit
+behavior that is dramatically different from that of more refined regions. In
+particular, coarse regions have a tendency to balloon out in an undesirable
+manner that is atypical of real cloth, as shown in
+Figures~\ref{fig:temporal_anticipation} and~\ref{fig:crowd}.
 
-To an extent, this issue can be overlooked as we have done so far in our examples. Since the artificial stiffening only affects out-of-frame faces, the
-artifact is not visible to the viewer. Our spatial and temporal smoothing ensure that any
-stiffened cloth coming into the view would return to the correct state in advance.
-Nevertheless, this incorrect motion in non-visible regions may cause undesirable side effects, such as introducing premature
-refinement by spatial and temporal anticipation due to the volume occupied by the stiffened cloth, and more generally, the potential for incorrect dynamics in the stiffened regions to affect the behavior of the visible part of the cloth.
+Because extreme coarsening mainly occurs for out-of-frame cloth regions, this
+undesirable behavior is generally not observable by the viewer. Additionally,
+our temporal smoothing causes cloth regions to be refined before they are
+visible, allowing transient artifacts to settle out.  Nevertheless, 
+the incorrect motion of non-visible regions may cause undesirable side effects, such as producing incorrect dynamics in the stiffened regions to affect the behavior of the visible part of the cloth.
 
 We can avoid this artificial stiffening by switching coarse faces
 to a material model that permits compression in lieu of sub-element buckling
 \cite{Choi:2002:SBR,Wang:2010:MIS}.
-However, simply removing compression resistance for all non-visible faces creates undesirable artifacts as well, as shown in Figure \ref{fig:no_full_adaptive} (middle). Instead, we allow compression adaptively based on each face's
+However, simply removing compression resistance for all non-visible faces would also create undesirable artifacts, as shown in Figure~\ref{fig:no_full_adaptive} (middle). Instead, we allow compression adaptively based on each face's
 area as follows.
 
 The Green strain tensor of face $i$ is
@@ -540,8 +548,8 @@ with area-based compression factor $\beta_i$,
   a = \min_{\forall j \in S} A_j,\quad b = \max_{\forall j \in S} A_j,
 \end{gather}
 where $A_i$ is area of face $i$ in material space, $S$ is a set of all out-of-frustum
-faces, and $k\ge1$ is a parameter controlling the amount of compensation. Since our compression factor increases with material-space area, the degree of allowed compression changes adaptively: the bigger the triangle, the
-more compressible it is.
+faces, and $k\ge1$ is a parameter controlling the amount of compensation. Because this compression factor increases with material-space area, the degree of allowed compression changes adaptively: the bigger the triangle, the
+more compressible it is.  This behavior approximates the fine-scale buckling that otherwise have occurred in the cloth represented by the coarse element.
 
 \begin{figure}[t]
   \centering
@@ -551,14 +559,16 @@ more compressible it is.
   \label{fig:no_full_adaptive}
 \end{figure}
 
-This area-based adaptive compensation has several advantages over non-adaptive
-compensation. First,
-it prevents excessive compression as shown in Figure~\ref{fig:no_full_adaptive} (right). On the waist of the
-dress, there is excessive compression which makes the dress shorter than the original
-shape. These overly compressed triangles inflate quickly and cause popping artifacts when
-they become visible, necessitating a much greater amount of spatial and temporal smoothing.  Second, this excessive compression may result in extremely small
-triangles. Certain simulation steps such as collision
-detection and interpenetration handling have difficulty handling these highly compressed triangles robustly.
+% This area-based adaptive compensation has several advantages over non-adaptive
+% compensation. First, it prevents excessive compression as shown in
+%Figure~\ref{fig:no_full_adaptive} (right). On the waist of the dress, there is
+%excessive compression which makes the dress shorter than the original shape.
+%These overly compressed triangles inflate quickly and cause popping artifacts
+%when they become visible, necessitating a much greater amount of spatial and
+%temporal smoothing. Second, this excessive compression may result in extremely
+%small triangles. Certain simulation steps such as collision detection and
+%interpenetration handling have difficulty handling these highly compressed
+%triangles robustly.
 
 \begin{figure}[t]
   \centering
@@ -568,8 +578,9 @@ detection and interpenetration handling have difficulty handling these highly co
   \label{fig:no_vs_adaptive}
 \end{figure}
 
-Finally, we point out that this approach is not limited to view-dependent adaptivity, and can be applied to
-any other adaptive algorithm suffering from similar artifacts.  The compression
+We note that this approach to approximating the coarse effects of fine-scale buckling
+is not specific to view-dependent adaptivity, and it could be applied to
+ other adaptive algorithms suffering from similar artifacts.  The compression
 factor $\beta$ is unrelated to the view factor, as buckling is purely a physical phenomenon independent of the viewing direction. Therefore, we have defined the compression factor
 entirely in terms of the area of faces and a user-defined parameter $k$.
 
@@ -584,7 +595,7 @@ entirely in terms of the area of faces and a user-defined parameter $k$.
     \includegraphics[width=1.0\columnwidth]{timings}
 	% \vspace*{-.15in}	
     \caption{A comparison of view-independent and view-dependent adaptive simulations for
-        the example of Figure \ref{fig:teaser} in terms of per-frame and cumulative simulation times.}
+        the example of Figure~\ref{fig:teaser} in terms of per-frame and cumulative simulation times.}
     \label{fig:comparison}
 	% \vspace*{-.2in}
 \end{figure}
@@ -613,7 +624,7 @@ entirely in terms of the area of faces and a user-defined parameter $k$.
 \begin{table*}[t]
     \caption{Statistics and timing numbers for the examples. Non-adaptive simulations use a fixed
     high-resolution mesh. 
-	Adaptive simulations use the unmodified scheme implemented in ARCSim. % Times doesn't do italic small-caps
+	Adaptive simulations use the unmodified scheme implemented in \arcsim. % Times doesn't do italic small-caps
 	View-dependent simulations use the method described in this paper.
 	The adaptive simulations are used as a baseline for comparison.  
 	The non-adaptive mesh resolution was selected to match the visual quality of the 
@@ -636,7 +647,7 @@ examples. All simulations were run on a machine with an Intel Xeon E5-2680 v2
 processor and 16 GB RAM using 4 execution threads.
 The constants for view-dependent refinement that were used for these examples are
 $\nu_{\text{back}} = 0.2$, $m = 0.4\ \mathrm{m}$, $T = 5\ \mathrm{frames}$, and
-$\nu_{\text{out}} = 0.01$.  For the example shown in Figure 1, we used larger
+$\nu_{\text{out}} = 0.01$.  However, for the example shown in Figure 1, we used larger
 $\nu_{\text{out}} = 0.1$ to avoid intersection problems with the layered garments.
 
 Figure~\ref{fig:teaser} shows a character wearing a layered outfit consisting
@@ -655,7 +666,9 @@ Figure~\ref{fig:crowd}. Note that while these characters are all
 performing the same actions in the same type of dress, they are simulated individually
 with different resolutions depending on their location relative to the viewpoint.
 In practical applications, multiple characters in a crowd
-would have different garments and motions and would therefore also have to be simulated
+would likely have different garments and distinct movements,
+and would therefore 
+also have to be simulated
 individually even without view dependence.
 
 Timings for these three examples are reported in Table~\ref{table:timings}. The single character examples
@@ -681,7 +694,7 @@ does not manifest as visible popping because the dramatic remeshing generally
 happens off screen. The motion that appears on screen is only gentle swaying that
 looks fairly natural. If the subject is moving, then this gentle motion is
 completely masked by the normal motion of the cloth. Even with a still subject, the
-artificial motion can still be hard to detect due to the movement of the camera.
+artificial motion can  be hard to detect due to the movement of the camera.
 
 
 \section{Conclusions}
