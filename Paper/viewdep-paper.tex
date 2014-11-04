@@ -512,12 +512,12 @@ Because extreme coarsening mainly occurs for out-of-frame cloth regions, this
 undesirable behavior is generally not observable by the viewer. Additionally,
 our temporal smoothing causes cloth regions to be refined before they are
 visible, allowing transient artifacts to settle out.  Nevertheless, 
-the incorrect motion of non-visible regions may cause undesirable side effects, such as producing incorrect dynamics in the stiffened regions to affect the behavior of the visible part of the cloth.
+the incorrect motion of out-of-view regions may cause undesirable side effects, such as producing incorrect dynamics in the stiffened regions to affect the behavior of the visible part of the cloth.
 
 We can avoid this artificial stiffening by switching coarse faces
 to a material model that permits compression in lieu of sub-element buckling
 \cite{Choi:2002:SBR,Wang:2010:MIS}.
-However, simply removing compression resistance for all non-visible faces would also create undesirable artifacts, as shown in Figure~\ref{fig:no_full_adaptive} (middle). Instead, we allow compression adaptively based on each face's
+However, simply removing compression resistance for all out-of-view faces would also create undesirable artifacts, as shown in Figure~\ref{fig:no_full_adaptive} (middle). Instead, we allow compression adaptively based on each face's
 area as follows.
 
 The Green strain tensor of face $i$ is
