@@ -407,7 +407,7 @@ In non-visible regions, it is sufficient to uniformly coarsen the mesh resolutio
 However, for visible regions, we wish to preserve the geometrical and dynamical detail resolved by the original sizing field as much as possible, only coarsening when such detail would not be visually important.
 
 The sizing field $\mathbf M_{\text{vd}}$ gives the mesh resolution needed to accurately capture the dynamics of all cloth features.
-From the camera's perspective, however, wrinkles and folds that are very distant or foreshorted will appear extremely small in the final image.
+From the camera's perspective, however, wrinkles and folds that are very distant or foreshortened will appear extremely small in the final image.
 Such features are not likely to affect the visual appearance of the cloth and need not be represented accurately; they can simply be coarsened away.
 On the other hand, features that appear large in the image should remain accurately represented at the resolution determined by the original sizing field.
 
